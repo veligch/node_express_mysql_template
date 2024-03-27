@@ -18,7 +18,7 @@ router.post('/login', jsonParser, (req, res) => {
     SELECT 
       *
     FROM 
-      users 
+      admin_template.user 
     WHERE 
       username='${username}' AND password='${md5(password)}'
   `;
