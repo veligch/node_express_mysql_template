@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 // 数据库
-const connection = require('../db/connection');
+const connection = require('../../db/connection');
 // 工具函数
-const setToken = require('../utils/setToken');
+const setToken = require('../../utils/setToken');
 const md5 = require('md5');
 // 解析请求体的中间件
 const bodyParser = require('body-parser');
@@ -27,7 +27,7 @@ router.post('/login', jsonParser, (req, res) => {
     // 查询错误
     if (err) {
       return res.json({
-        code: '1001',
+        code: 101,
         msg: '数据库查询错误',
         data: null
       })
@@ -36,7 +36,7 @@ router.post('/login', jsonParser, (req, res) => {
     // 没有数据
     if (!data) {
       return res.json({
-        code: '1002',
+        code: 102,
         msg: '用户名或密码错误',
         data: null
       })
@@ -47,16 +47,34 @@ router.post('/login', jsonParser, (req, res) => {
       username: data[0].username,
       uid: data[0].uid
     })
+    connection.query(`
+      update admin_template.user
+      set token = ${token}
+      where user.username = ${username}
+    `);
     res.json({
-      code: '0000',
+      code: 200,
       msg: '登录成功',
       data: {
-        token,
-        nickname: data[0].nickname
+        token
       }
     })
   });
 });
+
+// 用户信息 接口
+// router.get('/info', (req, res) => {
+//   const token = req.get('token');
+
+//   const sql = `
+//     SELECT 
+//       *
+//     FROM 
+//       admin_template.user 
+//     WHERE 
+//       token='${token}'
+//   `;
+// })
 
 
 module.exports = router;
